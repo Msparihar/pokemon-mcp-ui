@@ -42,24 +42,6 @@ export default function ChatPage() {
     error,
   } = useWebSocket("ws://localhost:8000/ws")
 
-  // Load messages from localStorage on mount
-  useEffect(() => {
-    const savedMessages = localStorage.getItem("chat-messages")
-    if (savedMessages) {
-      try {
-        const parsed = JSON.parse(savedMessages)
-        setMessages(
-          parsed.map((msg: any) => ({
-            ...msg,
-            timestamp: new Date(msg.timestamp),
-          })),
-        )
-      } catch (error) {
-        console.error("Failed to load saved messages:", error)
-      }
-    }
-  }, [])
-
   // Save messages to localStorage
   useEffect(() => {
     if (messages.length > 0) {
@@ -80,8 +62,12 @@ export default function ChatPage() {
 
       setMessages((prev) =>
         prev
-          .map((msg) => (msg.sender === "user" && msg.status === "sent" ? { ...msg, status: "delivered" } : msg))
-          .concat(newMessage),
+          .map((msg) =>
+            msg.sender === "user" && msg.status === "sent"
+              ? { ...msg, status: "delivered" as const }
+              : msg
+          )
+          .concat(newMessage)
       )
 
       setIsTyping(false)
@@ -103,7 +89,7 @@ export default function ChatPage() {
       })
 
       // Mark pending messages as error
-      setMessages((prev) => prev.map((msg) => (msg.status === "sent" ? { ...msg, status: "error" } : msg)))
+      setMessages((prev) => prev.map((msg) => (msg.status === "sent" ? { ...msg, status: "error" as const } : msg)))
       setIsTyping(false)
     }
   }, [error, toast])
