@@ -40,7 +40,7 @@ export default function ChatPage() {
     sendMessage: sendWebSocketMessage,
     lastMessage,
     error,
-  } = useWebSocket("ws://localhost:8000/ws")
+  } = useWebSocket(process.env.NEXT_PUBLIC_WS_URL!)
 
   // Save messages to localStorage
   useEffect(() => {
